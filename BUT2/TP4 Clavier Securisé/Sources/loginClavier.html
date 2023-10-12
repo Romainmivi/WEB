@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>login munérique</title>
+		 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+		<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+		<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+		<style >
+		table {border:0.2em black solid; margin-left:3em; cursor:pointer}
+		.case {width:12; height:12;background-color:grey}
+		.activecase {background-color:white}
+		input {height:1.5em;width:18em; display:block}
+		input[name=code] {disabled:disabled}
+		</style>
+		<script>
+			//Quelques variables utiles
+			var nbTouches = 0;	//initialisation du nombre de touches saisies par l'utilisateur
+			var vdef= "valeur du code saisi : "; 	//Chaîne d'affichage par défaut dans <input type="code">
+			var maxTentatives = 3; 	//reduction du nb de soumission à maxTentatives
+			var maxTouches = 6; 	//nb de chiffres du code à saisir
+			var dimCarre = 4;		//spécifie la dimension matricielle du clavier carré
+						
+			//Quelques références (jquery) sur les balises de la page
+			var allcases;				//référence à toutes les balises <td> du clavier HTML (id="clavier")
+			var activecases;			//référence à celles qui ont class="activecase"
+			var icode;					//référence à la balise affichant le code saisi <input name="code">
+			var form;					//référence au formulaire <form action="" method="post">
+			var msg;					//référence à la zone de messages à l'utilisateur <div id="msg">
+
+			//A FAIRE  >>>>>>>>>>>
+				//Exécution par lancement de la fonction init.
+			$(document).ready(init)			
+			
+			//A FAIRE >>>>>>>>>>>	Quelques fonctions à écrire
+			function init(){
+				remplirClavierNum()
+				// console.log("coucou")
+				//Spécifier les valeurs des variables jquery suivantes (voir ci-dessus les explications).
+				allcases	= $("#clavier td")								
+				activecases = $("#clavier td .activecase")							
+				icode 		= $('input[name="code"]')		
+				form 		= $('form[method="post"]')
+				msg			= $('div #msg')
+
+				// console.log(activecases)
+				
+				//actions initiales à écrire : 
+					//ajouter vdef comme valeur initiale de <input name="code">
+					icode.attr('value',vdef)						
+					//autoriser les écoutes de clics sur le clavier pour lancer la fonction touche.
+					allcases.on('click',touche)
+					//autoriser la soumission du formulaire pour invoquer la fonction soumettre (clic sur bouton <input type="submit">)
+					form.find('input[type="submit"]').on('click',soumettre)
+					//autoriser l'effacement des données du formulaire pour invoquer effacerCode (clic sur bouton <input type="reset">)
+					form.find('input[type="reset"]').on('click',effacerCode)
+
+					// var inputElement = document.querySelector('input[name="code"]');
+				    // var previousValue = inputElement.value;
+
+				    // inputElement.addEventListener('input', function () {
+				    //     var currentValue = inputElement.value;
+
+				    //     if (previousValue.length > currentValue.length) {
+				    //         console.log("Un caractère a été effacé.");
+				    //     }
+
+				    //     // Mettez à jour la valeur précédente pour la prochaine comparaison
+				    //     previousValue = currentValue;
+				    // });					
+				
+				//Note pour le DST : l'initialisation clavier est faite statiquement dans les cellules de <table>
+				//  donc, ne pas faire la fonction remplirClavierNum();  
+			}
+			
+			//A FAIRE >>>>>>>>>>>	
+			function touche () {
+				//cette fonction
+				//complete la valeur de la balise <input name="code"> 
+				//la valeur de la touche du clavier couramment saisie.
+				//En tout, il ne peut y avoir plus de saises que maxTouches. 
+				// console.log($(this).text())
+				if(nbTouches < maxTouches){
+					nbTouches++
+					vdef += $(this).text()
+					icode.attr('value',vdef)
+				}
+			}			
+			
+			//A FAIRE >>>>>>>>>>>	
+			function soumettre () {
+				event.preventDefault();
+				//soumission du formulaire par une requête jquery ajax ou équivalente
+				//Il ne peut y avoir plus de soumissions que maxTentatives. 
+				//La requete ne peut être soumise que si la taille du code est MaxChiffres.
+				//L'attribut action du formulaire devra être renseigné
+				//du façon à invoquer le fichier de script "loging-clavier.php"
+				//Ce script php n'est pas à écrire pour le DST mais
+				//il récupére 2 paramètres en entrée : le nom et le code saisi, 
+				//et fait un echo avec "ok" ou "ko" suivant la validité du code.
+				//Notes : 
+				//s.indexOf(sch) donne la position de la sous chaine sch dans la chaîne s ou "-1" 
+				//s.indexOf(i,s.length-1) extrait la fin de la chaîne s à partir de sa position i (i<s.length)
+				//Ne pas oublier d'effacer le code de la valeur de <input name="code">
+				//en invoquant la fonction effacerCode suivante.
+				if(nbTouches == 6){
+					console.log("coucou")
+				}
+			} 
+			
+			//A FAIRE >>>>>>>>>>> 
+			function effacerCode () {
+				//cette fonction
+				//affecte vdef comme valeur initiale de la balise <input name="code">
+				// ...
+			}
+			//A FAIRE pour le DST : uniquement le point (1) cité.
+			function remplirClavierNum() {
+
+				//(1)Elimine globalement la classe de style "activecase" 
+				// pour toutes les cellules <td> du clavier
+				//puis affecte 10 d'entre elles tirées aléatoirement 
+				//avec la classe de style "activecase"
+				// ...
+				
+				//(2) Seules les cellules ayant la classe de style "activecase" 
+				//supporteront un chiffre qui sera tiré dynamiquement et aléatoirement 
+				//pris parmi les chiffres non encore attribués.
+				//Note : tab.splice(c,1) enlève la case d'indice c du tableau tab
+				//Note : Math.round() arrondi à l'entier le plus prêt
+				//Note : Math.floor() tronque donnant l'entier proche inférieur 
+
+				// document.addEventListener("DOMContentLoaded", function() {
+				const modif = document.getElementById("clavier")
+				let tab = new Array(0,1,2,3,4,5,6,7,8,9,null,null,null,null,null,null)
+
+				const table = document.createElement("table");
+				table.setAttribute("id","clavier")
+				for (let i = 0; i < dimCarre; i++) {
+					const ligne = document.createElement("tr");
+					for (let j = 0; j < dimCarre; j++) {
+						const cellule = document.createElement("td");
+						cellule.classList.add("case");
+						let a = Math.floor(Math.random()*tab.length)
+						console.log(a)
+						if (tab[a] !== null) {
+							cellule.classList.add("activecase");
+							cellule.textContent = tab[a];
+						}
+						tab.splice(a,1)
+						ligne.appendChild(cellule);
+					}
+					table.appendChild(ligne);
+				}
+				modif.parentNode.replaceChild(table, modif)
+			// });
+				// console.log(tab)
+				// for(let i=0;i<9;++i){
+				// 	let a = Math.floor(Math.random()*tab.length)
+				// 	console.log(a)//
+				// 	tab.splice(a,1)
+				// 	console.log(tab)
+				// }
+			}
+
+			
+			
+		</script>
+<body>
+		<h2> Login numérique</h2>
+	
+		<h3> Clavier de saisie de votre code <br/>
+		(3 tentatives maximum)</h3>
+		<table id="clavier">
+				<tr><td class="case activecase">7</td>
+					<td class="case activecase">2</td>
+					<td class="case"></td>
+					<td class="case activecase">9</td>
+				</tr>
+				<tr><td class="case"></td>
+					<td class="case activecase">0</td>
+					<td class="case activecase">5</td>
+					<td class="case"></td>
+				</tr>
+				<tr><td class="case activecase">6</td>
+					<td class="case activecase">8</td>
+					<td class="case activecase">1</td>
+					<td class="case"></td>
+				</tr>
+				<tr><td class="case"></td>
+					<td class="case"></td>
+					<td class="case activecase">3</td>
+					<td class="case activecase">4</td>
+				</tr>
+			</table>
+		<form method="post" action=""> 
+			<div>
+				<input type="text" name="nom" placeholder="saisir votre nom, svp:"/>
+				<input type="text" name="code" value=""/>
+			</div>
+			<input type="submit" value="valider">
+			<input type="reset" value="effacer">
+		</form>
+		<div id="msg">
+		</div>
+	</body>
+</html>
