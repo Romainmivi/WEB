@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<!-- leafletjs -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+	<!-- jqueryui -->
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+ 	
+	<title>Index</title>
+</head>
+<body>
+	<p>2 interactions possibles :</p>
+	
+
+	<div id="map"></div>
+
+    <!-- jqueryui -->
+	<div class="ui-widget-content draggable">
+  		<p>France</p>
+	</div>
+	<div id="b" class="ui-widget-content draggable">
+  		<p>Canada</p>
+	</div>
+	<div id="c" class="ui-widget-content draggable">
+  		<p>Belgique</p>
+	</div>
+	<div id="d" class="ui-widget-content draggable">
+  		<p>Japon</p>
+	</div>
+	<div id="d" class="ui-widget-content draggable">
+  		<p>Italie</p>
+	</div>
+
+	<p id="test">Drop here</p>
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script type="text/javascript">
+     	var map = L.map('map').setView([48.582, -3.833], 10);
+     	map.touchZoom.disable();
+		map.doubleClickZoom.disable();
+		map.scrollWheelZoom.disable();
+		map.boxZoom.disable();
+		map.keyboard.disable();
+		var tileLayerOptions = {
+		    maxZoom: 10, // Niveau de zoom maximum
+		    minZoom: 10, // Niveau de zoom minimum
+		    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		};
+     	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', tileLayerOptions).addTo(map);
+
+     	var cityCoordinates = [48.582, -3.833]; // Remplacez latitude et longitude par les coordonnées de la ville
+		var cityCircle = L.circle(cityCoordinates, {
+	    color: 'black', // Couleur du contour
+	    fillColor: 'transparent', // Couleur de remplissage
+	    fillOpacity: 0.0, // Opacité du remplissage
+	    radius: 10000 // Rayon du cercle en mètres
+}).addTo(map);
+     	var limitBounds = L.latLngBounds(
+    		L.latLng(41, -5), // Coin sud-ouest de la zone limite
+   			L.latLng(51, 9)   // Coin nord-est de la zone limite
+		);
+
+		map.setMaxBounds(limitBounds);
+    </script>
+    <!-- jqueryui -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  	<script>
+		$( function() {
+	    	$( ".draggable" ).draggable();
+	    	$( "#map" ).droppable({
+	      		drop: function( event, ui ) {
+	      			$( ".draggable" ).draggable({ revert: "valid" });
+	      			var countryname = $(ui.draggable).text();
+	      			$.ajax({
+	      				type: "GET",
+	      				url: "https://nominatim.openstreetmap.org/search",
+	      				data: {
+	      					q: countryname,
+	      					format: "json",
+	      					limit: 1
+	      				},
+	      				success: function(data){
+	      					var latitude = parseFloat(data[0].lat);
+	      					var longitude = parseFloat(data[0].lon);
+	      					map.setView([latitude,longitude], 6);
+		    				$("#test").html(countryname);
+	      				},
+	      				error: function(){
+	      					alert("Erreur lors de la requête à l'API Nominatim.");
+	      				}
+	      			})
+	      			// moi
+
+	        	}
+	    	});
+  		} );
+  		// var popup = L.popup();
+
+		function onMapClick(e) {
+		//     popup
+		//         .setLatLng(e.latlng)
+		//         .setContent("You clicked the map at " + e.latlng.toString())
+		//         .openOn(map);
+		// }
+			$.ajax({
+		      	type: "GET",
+		      	url: "https://nominatim.openstreetmap.org/reverse?lat="+e.latlng.lat+"&lon="+e.latlng.lng+"",
+		      	data: {
+		      		format: "json",
+		      		limit: 1
+		      	},
+		      	success: function(data){
+		      		var a = data.address.municipality
+		      		console.log(e.latlng.lat,e.latlng.lng)
+		    		$("#test").html(a);
+		      	},
+		      	error: function(){
+		      		alert("Erreur lors de la requête à l'API Nominatim.");
+		      	}
+			})
+		}
+		map.on('click', onMapClick);
+	</script>
+</body>
+</html>
